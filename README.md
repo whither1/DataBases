@@ -1,2 +1,2 @@
 # DataBases
-BMSTU, 5 sem, 2024
+BMSTU, 2024, 5 sem
