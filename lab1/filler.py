@@ -7,9 +7,9 @@ from datetime import datetime, timedelta
 fake = Faker('ru_RU')
 
 # Функция для генерации случайной даты рождения
-def random_birth_date(start_year, end_year):
-    start_date = datetime(year=start_year, month=1, day=1)
-    end_date = datetime(year=end_year, month=12, day=31)
+def random_birth_date(start_month, end_month):
+    start_date = datetime(year=2024, month=start_month, day=1)
+    end_date = datetime(year=2024, month=end_month, day=30)
     time_between_dates = end_date - start_date
     days_between_dates = time_between_dates.days
     random_number_of_days = random.randrange(days_between_dates)
@@ -77,3 +77,10 @@ with open('/tmp/postgres/books.csv', 'w', newline='', encoding='utf-8') as csvfi
             'publisher_id': random.randint(1, n),
             'translator_id': random.randint(1, n)
         })
+
+with open('./RK2/data', 'w', encoding='utf-8') as w:
+    for _ in range(10):
+        line = 'INSERT INTO excursions_stands(excursion_id, stand_id) VALUES (\'{}\', \'{}\');\n'.format(
+        random.randint(1, 10),
+        random.randint(1, 10))
+        w.write(line)
