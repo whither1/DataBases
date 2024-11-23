@@ -2,8 +2,8 @@ import psycopg2
 
 conn_params = {
     'dbname': 'books',
-    'user': 'whither',
-    'password': 'q1w2e3',
+    'user': '',
+    'password': '',
     'host': '127.0.0.1',
     'port': '5432'
 }
@@ -20,6 +20,7 @@ def print_menu():
     print("8 - Системная функция")
     print("9 - Создать таблицу")
     print("10 - Вставить данные в созданную таблицу")
+    print("11 - По названию издательства определить книги текущего года в заданном жанре. Вывести 10 книг")
     print("Выберите действие: ")
 
 querys = {
@@ -54,7 +55,8 @@ ORDER BY
     7: "CALL del_books_by_date_in_month('2004-09-01');",
     8: "SELECT current_database();",
     9: "CREATE TABLE IF NOT EXISTS reader(id serial, name text, fav_genre text, fav_book_id int, bio text);",
-    10: "INSERT INTO reader(name, fav_genre, fav_book_id, bio) values (\"test_entry\", \"Fiction\", 2, \"TEST\")"
+    10: "INSERT INTO reader(name, fav_genre, fav_book_id, bio) values (\'test_entry\', \'Fiction\', 2, \'TEST\')",
+    11: "SELECT * FROM book JOIN publisher ON book.publisher_id = publisher.id WHERE (extract(YEAR from publication_date) = extract(YEAR from now()) AND genre = \'{}\' AND name = \'{}\') LIMIT 10;"
 }
 
 def main():
@@ -64,17 +66,28 @@ def main():
             while True:
                 print_menu()
                 choice = int(input())
-                if not 0 <= choice <= 11:
+                if not 0 <= choice <= 12:
                     print("Введите номер действия от 0 до 10")
                 if not choice:
                     break
-                cur.execute(querys[choice])
-                if cur.description:
-                    rows = cur.fetchall()
-                    for row in rows:
-                        print(row)
+                try:
+                    if choice == 11:
+                        genre = input("Введите жанр искомых книг: ")
+                        publisher = input("Введите издательство искомых книг: ")
+                        cur.execute(querys[choice].format(genre, publisher))
+                    else:
+                        cur.execute(querys[choice])
+                    conn.commit()
+                except psycopg2.errors.UndefinedTable:
+                    print("Сначала создайте таблицу(опция 9)")
+                    conn.rollback()
                 else:
-                    print("Успех!")
+                    if cur.description:
+                        rows = cur.fetchall()
+                        for row in rows:
+                            print(*row)
+                    else:
+                        print("Успех!")
 
 if __name__ == '__main__':
     main()
