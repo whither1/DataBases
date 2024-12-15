@@ -1,3 +1,5 @@
-.venv
+.venv/
+nifi/
+nifi_registry/
 
 *.json
